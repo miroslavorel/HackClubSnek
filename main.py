@@ -1,3 +1,5 @@
+#To-do list: 1) Finish Main Menu, 2) Create a functional Game Over screen, 3) Create the main game loop
+
 import pygame
 import time
 import random
