@@ -12,6 +12,10 @@ fontP = pygame.font.SysFont("Cambria", 28)
 gameWindow = pygame.display.set_mode((800, 600))
 gameWindow.fill((0,0,0))
 pygame.display.set_caption("TEST WINDOW")
+bg = pygame.Surface((800, 600))
+bg.fill((0, 0, 0))
+bg = pygame.image.load("imgs/bg.png").convert_alpha()
+bg = pygame.transform.scale(bg, (800, 600))
 
 class Player():
     def __init__(self):
@@ -21,6 +25,7 @@ class Player():
         self.head = pygame.Surface((30, 30))
         self.head.fill((0, 200, 0))
         self.dir = "RIGHT"
+        self.score = 0
 
     def move(self):
         if self.dir == "RIGHT":
@@ -35,29 +40,53 @@ class Player():
 
 player = Player()
 
-apple = pygame.surface.Surface((40, 40))
-apple.fill((255, 0, 0))
-apple_x = -100
-apple_y = -100
-apple_x_def = -100
-apple_y_def = -100
-apple_vel_x = 0
-apple_vel_y = 0
-apple_vel_y_def = 0
+class Apple():
+    def __init__(self):
+        self.x = 190
+        self.y = 160
+        self.old_x = 190
+        self.old_y = 160
+        self.vel_x = 0
+        self.vel_y = 0
+        self.shape = pygame.Surface((20, 20))
+        self.shape.fill((255, 0, 0))
+
+    def getNewPos(self):
+        while self.x == self.old_x:
+            self.x += 1
+            self.old_x += 1
+            while self.x % 3 != 0:
+                self.x = random.randint(1, int(gameWindow.width/10) - 4)
+                self.x = self.x * 10
+            
+        while self.y == self.old_y:
+            self.y += 1
+            self.old_y += 1
+            while self.y % 3 != 0:
+                self.y = random.randint(1, int(gameWindow.height/10) - 4)
+                self.y = self.y * 10
+        self.x = self.x + 15    
+        self.y = self.y + 15
+        self.old_x = self.x
+        self.old_y = self.y
+
+apple = Apple()
 
 a = 1
 b = 0
 
 clock = pygame.time.Clock()
 
+debug = 1
+
 game_state = 0
 
-""" def collision_detection():
-    return (player_x <= (apple_x +int(apple.width)) and 
-            (player_x + player.width) >= apple_x and 
-            player_y <= (apple_y + apple.height + 5) and 
-            (player_y + player.height) >= apple_y)
- """
+def apple_collision_detection():
+    return (player.body[-1][0] <= (apple.x +int(apple.shape.width)) and 
+            (player.body[-1][0] + player.shape.width) >= apple.x and 
+            player.body[-1][1] <= (apple.y + apple.shape.height + 5) and 
+            (player.body[-1][1] + player.shape.height) >= apple.y)
+
 while True:
     clock.tick(10)
     match game_state:
@@ -67,9 +96,7 @@ while True:
                     quit(0)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        apple_x = apple_x_def
-                        apple_y = apple_y_def
-                        apple_vel_y = apple_vel_y_def
+                        apple.getNewPos()
 
                         game_state = 1
 
@@ -82,7 +109,7 @@ while True:
 
             b += 1
 
-            if b > 1000:
+            if b > 3:
                 a = -a
                 b = 0
 
@@ -105,13 +132,15 @@ while True:
                     elif event.key == pygame.K_DOWN:
                         if player.dir != "UP" and player.dir != "DOWN":
                             player.dir = "DOWN"
+                    elif event.key == pygame.K_BACKSPACE:
+                        debug = -debug
     
 
             player.move()
             
-            """ if collision_detection():
-                apple_y = random.randint(0, gameWindow.height - 50)
-                apple_x = random.randint(0, gameWindow.width - 50) """
+            if apple_collision_detection():
+                player.score += 1
+                apple.getNewPos()
     
             
         case 2:
@@ -125,34 +154,45 @@ while True:
 
     #Drawing
 
+    #Main Menu Drawing
     if game_state == 0:
         gameWindow.fill((255, 255, 255))
 
         gameWindow.blit(welcomeText, (230, 50))
         gameWindow.blit(playText, (230, 450))
 
+    #Main Game Loop Drawing
     elif game_state == 1:
         gameWindow.fill((0, 0, 0))
+        
+        gameWindow.blit(bg, (0, 0))
+
 
         for i in player.body[0:-1]:
             gameWindow.blit(player.shape, i)
         gameWindow.blit(player.head, player.body[-1])
 
         #DEBUG TEXT
-        """ debugText0 = fontP.render(str(player_x), False, (255, 255, 255))
-        debugText1 = fontP.render(str(player_y), True, (255, 255, 255))
-        debugText2 = fontP.render(str(player_x_last), True, (255, 255, 255))
-        debugText3 = fontP.render(str(player_y_last), True, (255, 255, 255))
-        gameWindow.blit(debugText0, (0, 0))
-        gameWindow.blit(debugText1, (0, 20))
-        gameWindow.blit(debugText2, (0, 40))
-        gameWindow.blit(debugText3, (0, 60)) """
+        if debug < 0:
+            debugText0 = fontP.render(str(player.body[-1][0]), False, (255, 255, 255))
+            debugText1 = fontP.render(str(player.body[-1][1]), True, (255, 255, 255))
+            debugText2 = fontP.render(str(apple.x), True, (255, 255, 255))
+            debugText3 = fontP.render(str(apple.y), True, (255, 255, 255))
+            gameWindow.blit(debugText0, (0, 0))
+            gameWindow.blit(debugText1, (0, 20))
+            gameWindow.blit(debugText2, (0, 40))
+            gameWindow.blit(debugText3, (0, 60))
+            debugText4 = fontP.render(str(apple.old_x), True, (255, 255, 255))
+            debugText5 = fontP.render(str(apple.old_y), True, (255, 255, 255))
+            gameWindow.blit(debugText4, (0, 80))
+            gameWindow.blit(debugText5, (0, 100))
             
 
-        apple_x += apple_vel_x
-        apple_y += apple_vel_y
-        gameWindow.blit(apple, (apple_x, apple_y))
+        apple.x += apple.vel_x
+        apple.y += apple.vel_y
+        gameWindow.blit(apple.shape, (apple.x, apple.y))
 
+    #Game Over Screen Drawing
     elif game_state == 2:
         gameWindow.fill((150, 0, 0))
 
