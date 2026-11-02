@@ -6,58 +6,86 @@ import random
 
 pygame.init()
 pygame.font.init()
-fontH1 = pygame.font.SysFont("Comic Sans MS", 60)
-fontP = pygame.font.SysFont("Comic Sans MS", 28)
+fontH1 = pygame.font.SysFont("Cambria", 80)
+fontP = pygame.font.SysFont("Cambria", 28)
 
 gameWindow = pygame.display.set_mode((800, 600))
 gameWindow.fill((0,0,0))
 pygame.display.set_caption("TEST WINDOW")
 
-player = pygame.surface.Surface((100, 100))
-player.fill((255, 255, 255))
-player_x = 350
-player_y = 250
-player_x_def = 350
-player_y_def = 250
-player_vel_x = 0
-player_vel_y = 0
+class Player():
+    def __init__(self):
+        self.body = [(220, 190), (250, 190), (280, 190), (310, 190)]
+        self.shape = pygame.Surface((30, 30))
+        self.shape.fill((0, 255, 0))
+        self.head = pygame.Surface((30, 30))
+        self.head.fill((0, 200, 0))
+        self.dir = "RIGHT"
 
-fal_obj = pygame.surface.Surface((50, 50))
-fal_obj.fill((255, 255, 255))
-fal_obj_x = 0
-fal_obj_y = 0
-fal_obj_x_def = 0
-fal_obj_y_def = 0
-fal_obj_vel_x = 0
-fal_obj_vel_y = 0.1
-fal_obj_vel_y_def = 0.1
+    def move(self):
+        if self.dir == "RIGHT":
+            self.body.append((self.body[len(self.body)-1][0] + 30 , self.body[len(self.body)-1][1]))
+        elif self.dir == "UP":
+            self.body.append((self.body[len(self.body)-1][0] , self.body[len(self.body)-1][1] - 30))
+        elif self.dir == "DOWN":
+            self.body.append((self.body[len(self.body)-1][0] , self.body[len(self.body)-1][1] + 30))
+        elif self.dir == "LEFT":        
+            self.body.append((self.body[len(self.body)-1][0] - 30 , self.body[len(self.body)-1][1]))
+        self.body.pop(0)
+
+player = Player()
+
+apple = pygame.surface.Surface((40, 40))
+apple.fill((255, 0, 0))
+apple_x = -100
+apple_y = -100
+apple_x_def = -100
+apple_y_def = -100
+apple_vel_x = 0
+apple_vel_y = 0
+apple_vel_y_def = 0
+
+a = 1
+b = 0
+
+clock = pygame.time.Clock()
 
 game_state = 0
 
-def collision_detection():
-    return (player_x <= (fal_obj_x +int(fal_obj.width)) and 
-            (player_x + player.width) >= fal_obj_x and 
-            player_y <= (fal_obj_y + fal_obj.height + 5) and 
-            (player_y + player.height) >= fal_obj_y)
-
+""" def collision_detection():
+    return (player_x <= (apple_x +int(apple.width)) and 
+            (player_x + player.width) >= apple_x and 
+            player_y <= (apple_y + apple.height + 5) and 
+            (player_y + player.height) >= apple_y)
+ """
 while True:
+    clock.tick(10)
     match game_state:
         case 0:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit(0)
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        player_x = player_x_def
-                        player_y = player_y_def
-
-                        fal_obj_x = fal_obj_x_def
-                        fal_obj_y = fal_obj_y_def
-                        fal_obj_vel_y = fal_obj_vel_y_def
+                    if event.key == pygame.K_RETURN:
+                        apple_x = apple_x_def
+                        apple_y = apple_y_def
+                        apple_vel_y = apple_vel_y_def
 
                         game_state = 1
 
-            welcomeText = fontH1.render("Snake Game", False, (0, 0, 0))
+            welcomeText = fontH1.render("Snake Game", True, (0, 0, 0))
+
+            if a > 0:
+                playText = fontP.render("PRESS ENTER TO PLAY", True, (0, 0, 0))
+            elif a < 0:
+                playText = fontP.render("PRESS ENTER TO PLAY", True, (255, 255, 255))
+
+            b += 1
+
+            if b > 1000:
+                a = -a
+                b = 0
+
         
         case 1:
             for event in pygame.event.get():
@@ -66,27 +94,26 @@ while True:
     
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        player_vel_x = -0.2
+                        if player.dir != "RIGHT" and player.dir != "LEFT":
+                            player.dir = "LEFT"
                     elif event.key == pygame.K_RIGHT:
-                        player_vel_x = 0.2
-                else:
-                    player_vel_x = 0
-                    player_vel_y = 0
+                        if player.dir != "LEFT" and player.dir != "RIGHT":
+                            player.dir = "RIGHT"
+                    elif event.key == pygame.K_UP:
+                        if player.dir != "DOWN" and player.dir != "UP":
+                            player.dir = "UP"
+                    elif event.key == pygame.K_DOWN:
+                        if player.dir != "UP" and player.dir != "DOWN":
+                            player.dir = "DOWN"
+    
+
+            player.move()
+            
+            """ if collision_detection():
+                apple_y = random.randint(0, gameWindow.height - 50)
+                apple_x = random.randint(0, gameWindow.width - 50) """
     
             
-            if collision_detection():
-                fal_obj_y = 0
-                fal_obj_x = random.randint(0, gameWindow.width - 50)
-    
-            if fal_obj_y >= 600:
-                player_x, player_y = 1000, 1000
-                player_vel_x, player_vel_y = 0, 0
-    
-                fal_obj_x, fal_obj_y = 1000, 1000
-                fal_obj_vel_x, fal_obj_vel_y = 0, 0
-    
-                game_state = 2
-
         case 2:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -101,18 +128,30 @@ while True:
     if game_state == 0:
         gameWindow.fill((255, 255, 255))
 
-        gameWindow.blit(welcomeText, (350, 250))
+        gameWindow.blit(welcomeText, (230, 50))
+        gameWindow.blit(playText, (230, 450))
 
     elif game_state == 1:
         gameWindow.fill((0, 0, 0))
 
-        player_x += player_vel_x
-        player_y += player_vel_y
-        gameWindow.blit(player, (player_x, player_y))
+        for i in player.body[0:-1]:
+            gameWindow.blit(player.shape, i)
+        gameWindow.blit(player.head, player.body[-1])
 
-        fal_obj_x += fal_obj_vel_x
-        fal_obj_y += fal_obj_vel_y
-        gameWindow.blit(fal_obj, (fal_obj_x, fal_obj_y))
+        #DEBUG TEXT
+        """ debugText0 = fontP.render(str(player_x), False, (255, 255, 255))
+        debugText1 = fontP.render(str(player_y), True, (255, 255, 255))
+        debugText2 = fontP.render(str(player_x_last), True, (255, 255, 255))
+        debugText3 = fontP.render(str(player_y_last), True, (255, 255, 255))
+        gameWindow.blit(debugText0, (0, 0))
+        gameWindow.blit(debugText1, (0, 20))
+        gameWindow.blit(debugText2, (0, 40))
+        gameWindow.blit(debugText3, (0, 60)) """
+            
+
+        apple_x += apple_vel_x
+        apple_y += apple_vel_y
+        gameWindow.blit(apple, (apple_x, apple_y))
 
     elif game_state == 2:
         gameWindow.fill((150, 0, 0))
