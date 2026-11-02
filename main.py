@@ -1,4 +1,4 @@
-#To-do list: 1) Finish Main Menu, 2) Create a functional Game Over screen, 3) Add snake getting longer
+#To-do list: 1) Finish Main Menu, 2) Finish Game Over screen
 
 import pygame
 import time
@@ -47,6 +47,15 @@ class Player():
         self.body[-1][1] > gameWindow.height - 30 or 
         self.body[-1][1] < 10)
 
+    def get_longer(self):
+        self.body.insert(0, self.body[0])
+
+    def apple_collision_detection(self):
+        return (self.body[-1][0] <= (apple.x +int(apple.shape.width) + 2) and #had x menší než jablko x plus jeho fyzická velikost
+            (self.body[-1][0] + self.shape.width + 2) >= apple.x and #had a jeho fyzická šířka větší než x jablka
+            self.body[-1][1] <= (apple.y + apple.shape.height + 5 + 2) and #had y menší než jabko x a jeho výška plus 5
+            (self.body[-1][1] + self.shape.height + 2) >= apple.y) #had y a jeho fyzická výška větší než y jablka
+
 player = Player()
 
 class Apple():
@@ -61,23 +70,21 @@ class Apple():
         self.shape.fill((255, 0, 0))
 
     def getNewPos(self):
-        while self.x == self.old_x:
-            self.x += 1
-            self.old_x += 1
-            while self.x % 3 != 0:
-                self.x = random.randint(1, int(gameWindow.width/10) - 4)
-                self.x = self.x * 10
+        while True:
+            self.x = random.randint(1, 24) * 30 + 15
+            self.y = random.randint(1, 18) * 30 + 15
             
-        while self.y == self.old_y:
-            self.y += 1
-            self.old_y += 1
-            while self.y % 3 != 0:
-                self.y = random.randint(1, int(gameWindow.height/10) - 4)
-                self.y = self.y * 10
-        self.x = self.x + 15    
-        self.y = self.y + 15
-        self.old_x = self.x
-        self.old_y = self.y
+            collision = False
+            for segment in player.body:
+                if (self.x < segment[0] + 30 and self.x + 20 > segment[0] and
+                    self.y < segment[1] + 30 and self.y + 20 > segment[1]):
+                    collision = True
+                    break 
+
+            if not collision and (self.x != self.old_x or self.y != self.old_y):
+                self.old_x = self.x
+                self.old_y = self.y
+                break
 
 apple = Apple()
 
@@ -90,11 +97,6 @@ debug = 1
 
 game_state = 0
 
-def apple_collision_detection():
-    return (player.body[-1][0] <= (apple.x +int(apple.shape.width)) and 
-            (player.body[-1][0] + player.shape.width) >= apple.x and 
-            player.body[-1][1] <= (apple.y + apple.shape.height + 5) and 
-            (player.body[-1][1] + player.shape.height) >= apple.y)
 
 while True:
     clock.tick(10)
@@ -107,6 +109,7 @@ while True:
                     if event.key == pygame.K_RETURN:
                         player.body = [(220, 190), (250, 190), (280, 190), (310, 190)]
                         player.dir = "RIGHT"
+                        player.score = 0
                         apple.vel_x = 0
                         apple.vel_y = 0
                         apple.getNewPos()
@@ -150,8 +153,9 @@ while True:
 
             player.move()
             
-            if apple_collision_detection():
-                player.score += 1
+            if player.apple_collision_detection():
+                player.score += 10
+                player.get_longer()
                 apple.getNewPos()
 
             if player.self_collision():
@@ -207,13 +211,14 @@ while True:
             debugText5 = fontP.render(str(apple.old_y), True, (255, 255, 255))
             gameWindow.blit(debugText4, (0, 80))
             gameWindow.blit(debugText5, (0, 100))
-            #debugText6 = fontP.render(), True, (255, 255, 255))
-            #gameWindow.blit(debugText6, (0, 120))
             
 
         apple.x += apple.vel_x
         apple.y += apple.vel_y
         gameWindow.blit(apple.shape, (apple.x, apple.y))
+
+        scoreText = fontH1.render(str(player.score), True, (255, 255, 255))
+        gameWindow.blit(scoreText, (10, 10))
 
     #Game Over Screen Drawing
     elif game_state == 2:
