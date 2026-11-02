@@ -1,4 +1,4 @@
-#To-do list: 1) Finish Main Menu, 2) Create a functional Game Over screen, 3) Create the main game loop
+#To-do list: 1) Finish Main Menu, 2) Create a functional Game Over screen, 3) Add snake getting longer
 
 import pygame
 import time
@@ -37,6 +37,15 @@ class Player():
         elif self.dir == "LEFT":        
             self.body.append((self.body[len(self.body)-1][0] - 30 , self.body[len(self.body)-1][1]))
         self.body.pop(0)
+
+    def self_collision(self):
+        return self.body[-1] in self.body[0:-1]
+
+    def wall_collision(self):
+        return (self.body[-1][0] > gameWindow.width - 20 or 
+        self.body[-1][0] < 10 or 
+        self.body[-1][1] > gameWindow.height - 30 or 
+        self.body[-1][1] < 10)
 
 player = Player()
 
@@ -96,6 +105,10 @@ while True:
                     quit(0)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
+                        player.body = [(220, 190), (250, 190), (280, 190), (310, 190)]
+                        player.dir = "RIGHT"
+                        apple.vel_x = 0
+                        apple.vel_y = 0
                         apple.getNewPos()
 
                         game_state = 1
@@ -134,13 +147,20 @@ while True:
                             player.dir = "DOWN"
                     elif event.key == pygame.K_BACKSPACE:
                         debug = -debug
-    
 
             player.move()
             
             if apple_collision_detection():
                 player.score += 1
                 apple.getNewPos()
+
+            if player.self_collision():
+                time.sleep(1)
+                game_state = 2
+
+            if player.wall_collision():
+                time.sleep(1)
+                game_state = 2
     
             
         case 2:
@@ -148,8 +168,9 @@ while True:
                 if event.type == pygame.QUIT:
                     quit(0)
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
+                    if event.key == pygame.K_RETURN:
                         game_state = 0
+            
 
 
     #Drawing
@@ -186,6 +207,8 @@ while True:
             debugText5 = fontP.render(str(apple.old_y), True, (255, 255, 255))
             gameWindow.blit(debugText4, (0, 80))
             gameWindow.blit(debugText5, (0, 100))
+            #debugText6 = fontP.render(), True, (255, 255, 255))
+            #gameWindow.blit(debugText6, (0, 120))
             
 
         apple.x += apple.vel_x
@@ -194,7 +217,15 @@ while True:
 
     #Game Over Screen Drawing
     elif game_state == 2:
-        gameWindow.fill((150, 0, 0))
+        gameWindow.fill((0, 0, 0))
+
+        if player.self_collision():
+            collisionText = fontP.render("YOU COLIDED WITH YOURSELF", True, (255, 255, 255))
+            gameWindow.blit(collisionText, (250, 250))
+
+        if player.wall_collision():
+            collisionText = fontP.render("YOU COLIDED WITH THE WALL", True, (255, 255, 255))
+            gameWindow.blit(collisionText, (250, 250))
 
         #gameWindow.blit(game_over, (50, 200))
 
