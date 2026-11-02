@@ -1,5 +1,3 @@
-#To-do list: 1) Finish Main Menu, 2) Finish Game Over screen
-
 import pygame
 import time
 import random
@@ -7,7 +5,9 @@ import random
 pygame.init()
 pygame.font.init()
 fontH1 = pygame.font.SysFont("Cambria", 80)
+fontH2 = pygame.font.SysFont("Cambria", 50)
 fontP = pygame.font.SysFont("Cambria", 28)
+fontPmini = pygame.font.SysFont("Cambria", 18)
 
 gameWindow = pygame.display.set_mode((800, 600))
 gameWindow.fill((0,0,0))
@@ -53,7 +53,7 @@ class Player():
     def apple_collision_detection(self):
         return (self.body[-1][0] <= (apple.x +int(apple.shape.width) + 2) and #had x menší než jablko x plus jeho fyzická velikost
             (self.body[-1][0] + self.shape.width + 2) >= apple.x and #had a jeho fyzická šířka větší než x jablka
-            self.body[-1][1] <= (apple.y + apple.shape.height + 5 + 2) and #had y menší než jabko x a jeho výška plus 5
+            self.body[-1][1] <= (apple.y + apple.shape.height) and #had y menší než jabko x a jeho výška plus 5
             (self.body[-1][1] + self.shape.height + 2) >= apple.y) #had y a jeho fyzická výška větší než y jablka
 
 player = Player()
@@ -116,7 +116,8 @@ while True:
 
                         game_state = 1
 
-            welcomeText = fontH1.render("Snake Game", True, (0, 0, 0))
+            welcomeText = fontH1.render("Chaos Snake", True, (0, 0, 0))
+            madeByTex = fontPmini.render("Made by Miroslav Orel (jbx505)", True, (0, 0, 0))
 
             if a > 0:
                 playText = fontP.render("PRESS ENTER TO PLAY", True, (0, 0, 0))
@@ -174,7 +175,6 @@ while True:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         game_state = 0
-            
 
 
     #Drawing
@@ -183,8 +183,9 @@ while True:
     if game_state == 0:
         gameWindow.fill((255, 255, 255))
 
-        gameWindow.blit(welcomeText, (230, 50))
-        gameWindow.blit(playText, (230, 450))
+        gameWindow.blit(welcomeText, (200, 50))
+        gameWindow.blit(madeByTex, (290, 135))
+        gameWindow.blit(playText, (265, 450))
 
     #Main Game Loop Drawing
     elif game_state == 1:
@@ -224,14 +225,19 @@ while True:
     elif game_state == 2:
         gameWindow.fill((0, 0, 0))
 
+        game_over = fontH1.render("GAME OVER", True, (255, 255, 255))
+        gameWindow.blit(game_over, (190, 50))
+
         if player.self_collision():
-            collisionText = fontP.render("YOU COLIDED WITH YOURSELF", True, (255, 255, 255))
-            gameWindow.blit(collisionText, (250, 250))
+            collisionText = fontH2.render("YOU COLIDED WITH YOURSELF", True, (255, 255, 255))
+            gameWindow.blit(collisionText, (65, 250))
 
         if player.wall_collision():
-            collisionText = fontP.render("YOU COLIDED WITH THE WALL", True, (255, 255, 255))
-            gameWindow.blit(collisionText, (250, 250))
+            collisionText = fontH2.render("YOU COLIDED WITH THE WALL", True, (255, 255, 255))
+            gameWindow.blit(collisionText, (60, 250))
 
-        #gameWindow.blit(game_over, (50, 200))
+        backToMenu = fontP.render("PRESS ENTER TO CONTINUE", True, (255, 255, 255))
+        gameWindow.blit(backToMenu, (230, 450))
+
 
     pygame.display.flip()
