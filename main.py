@@ -95,6 +95,8 @@ clock = pygame.time.Clock()
 
 debug = 1
 
+tickCool = 1
+
 game_state = 0
 
 
@@ -137,22 +139,29 @@ while True:
                     quit(0)
     
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        if player.dir != "RIGHT" and player.dir != "LEFT":
-                            player.dir = "LEFT"
-                    elif event.key == pygame.K_RIGHT:
-                        if player.dir != "LEFT" and player.dir != "RIGHT":
-                            player.dir = "RIGHT"
-                    elif event.key == pygame.K_UP:
-                        if player.dir != "DOWN" and player.dir != "UP":
-                            player.dir = "UP"
-                    elif event.key == pygame.K_DOWN:
-                        if player.dir != "UP" and player.dir != "DOWN":
-                            player.dir = "DOWN"
+                    if tickCool == 1:
+                        if event.key == pygame.K_LEFT:
+                            if player.dir != "RIGHT" and player.dir != "LEFT":
+                                player.dir = "LEFT"
+                                tickCool = -tickCool
+                        elif event.key == pygame.K_RIGHT:
+                            if player.dir != "LEFT" and player.dir != "RIGHT":
+                                player.dir = "RIGHT"
+                                tickCool = -tickCool
+                        elif event.key == pygame.K_UP:
+                            if player.dir != "DOWN" and player.dir != "UP":
+                                player.dir = "UP"
+                                tickCool = -tickCool
+                        elif event.key == pygame.K_DOWN:
+                            if player.dir != "UP" and player.dir != "DOWN":
+                                player.dir = "DOWN"
+                                tickCool = -tickCool
                     elif event.key == pygame.K_BACKSPACE:
                         debug = -debug
 
             player.move()
+            if tickCool == -1:
+                tickCool = -tickCool
             
             if player.apple_collision_detection():
                 player.score += 10
@@ -200,18 +209,18 @@ while True:
 
         #DEBUG TEXT
         if debug < 0:
-            debugText0 = fontP.render(str(player.body[-1][0]), False, (255, 255, 255))
-            debugText1 = fontP.render(str(player.body[-1][1]), True, (255, 255, 255))
+            debugText0 = fontP.render(str(player.dir), False, (255, 255, 255))
+            """ debugText1 = fontP.render(str(player.body[-1][1]), True, (255, 255, 255))
             debugText2 = fontP.render(str(apple.x), True, (255, 255, 255))
-            debugText3 = fontP.render(str(apple.y), True, (255, 255, 255))
+            debugText3 = fontP.render(str(apple.y), True, (255, 255, 255)) """
             gameWindow.blit(debugText0, (0, 0))
-            gameWindow.blit(debugText1, (0, 20))
+            """ gameWindow.blit(debugText1, (0, 20))
             gameWindow.blit(debugText2, (0, 40))
             gameWindow.blit(debugText3, (0, 60))
             debugText4 = fontP.render(str(apple.old_x), True, (255, 255, 255))
             debugText5 = fontP.render(str(apple.old_y), True, (255, 255, 255))
             gameWindow.blit(debugText4, (0, 80))
-            gameWindow.blit(debugText5, (0, 100))
+            gameWindow.blit(debugText5, (0, 100)) """
             
 
         apple.x += apple.vel_x
