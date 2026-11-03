@@ -206,21 +206,6 @@ while True:
         for i in player.body[0:-1]:
             gameWindow.blit(player.shape, i)
         gameWindow.blit(player.head, player.body[-1])
-
-        #DEBUG TEXT
-        if debug < 0:
-            debugText0 = fontP.render(str(player.dir), False, (255, 255, 255))
-            """ debugText1 = fontP.render(str(player.body[-1][1]), True, (255, 255, 255))
-            debugText2 = fontP.render(str(apple.x), True, (255, 255, 255))
-            debugText3 = fontP.render(str(apple.y), True, (255, 255, 255)) """
-            gameWindow.blit(debugText0, (0, 0))
-            """ gameWindow.blit(debugText1, (0, 20))
-            gameWindow.blit(debugText2, (0, 40))
-            gameWindow.blit(debugText3, (0, 60))
-            debugText4 = fontP.render(str(apple.old_x), True, (255, 255, 255))
-            debugText5 = fontP.render(str(apple.old_y), True, (255, 255, 255))
-            gameWindow.blit(debugText4, (0, 80))
-            gameWindow.blit(debugText5, (0, 100)) """
             
 
         apple.x += apple.vel_x
