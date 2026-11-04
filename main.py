@@ -64,10 +64,14 @@ class Apple():
         self.y = 160
         self.old_x = 190
         self.old_y = 160
+        self.prev_x = 190
+        self.prev_y = 160
         self.vel_x = 0
         self.vel_y = 0
         self.shape = pygame.Surface((20, 20))
         self.shape.fill((255, 0, 0))
+        self.dir = 0
+        self.move_time = 0
 
     def getNewPos(self):
         while True:
@@ -85,6 +89,80 @@ class Apple():
                 self.old_x = self.x
                 self.old_y = self.y
                 break
+
+    def moveIt(self):
+        self.dir = random.randint(-4, 4)
+
+    def wall_collision(self):
+        if self.x < 25:
+            if self.dir == -4:
+                self.dir = -self.dir
+            elif self.dir == -2:
+                self.dir = 1
+            elif self.dir == -1:
+                self.dir = 2
+        elif self.x > gameWindow.width - 55:
+            if self.dir == 4:
+                self.dir = -self.dir
+            elif self.dir == 2:
+                self.dir = -1
+            elif self.dir == 1:
+                self.dir = -2
+        elif self.y < 25:
+            if self.dir == -3:
+                self.dir = -self.dir
+            elif self.dir == -2:
+                self.dir = -1
+            elif self.dir == 1:
+                self.dir = 2
+        elif self.y > gameWindow.height - 65:
+            if self.dir == 3:
+                self.dir = -self.dir
+            elif self.dir == -1:
+                self.dir = -2
+            elif self.dir == 2:
+                self.dir = 1
+
+    def player_collision(self):
+        if self.move_time != 5:
+            return False
+
+        next_x = self.x
+        next_y = self.y
+
+        match self.dir:
+            case -4:  # Left
+                next_x -= 30
+            case -3:  # Up
+                next_y -= 30
+            case -2:  # Left up
+                next_x -= 30
+                next_y -= 30
+            case -1:  # Left down
+                next_x -= 30
+                next_y += 30
+            case 0:   # Stojí
+                pass
+            case 1:   # Right up
+                next_x += 30
+                next_y -= 30
+            case 2:   # Right down
+                next_x += 30
+                next_y += 30
+            case 3:   # Down
+                next_y += 30
+            case 4:   # Right
+                next_x += 30
+
+        for segment in player.body[0:-1]:
+            segment_x = segment[0]
+            segment_y = segment[1]
+            
+            if (next_x < segment_x + 30 and next_x + 20 > segment_x and 
+                next_y < segment_y + 30 and next_y + 20 > segment_y):
+                return True
+                
+        return False
 
 apple = Apple()
 
@@ -156,25 +234,34 @@ while True:
                             if player.dir != "UP" and player.dir != "DOWN":
                                 player.dir = "DOWN"
                                 tickCool = -tickCool
-                    elif event.key == pygame.K_BACKSPACE:
+                    if event.key == pygame.K_BACKSPACE:
                         debug = -debug
 
             player.move()
             if tickCool == -1:
                 tickCool = -tickCool
+            apple.move_time += 1
             
             if player.apple_collision_detection():
                 player.score += 10
                 player.get_longer()
                 apple.getNewPos()
+                #if player.score > 100:
+                apple.moveIt()
 
-            if player.self_collision():
+            apple.wall_collision()
+            if apple.player_collision():
+                #apple.x = apple.prev_x
+                #apple.y = apple.prev_y
+                apple.dir = -apple.dir
+
+            """ if player.self_collision():
                 time.sleep(1)
                 game_state = 2
 
             if player.wall_collision():
                 time.sleep(1)
-                game_state = 2
+                game_state = 2 """
     
             
         case 2:
@@ -206,14 +293,63 @@ while True:
         for i in player.body[0:-1]:
             gameWindow.blit(player.shape, i)
         gameWindow.blit(player.head, player.body[-1])
-            
 
+        if apple.move_time == 5:
+            match apple.dir:
+                case -4: #Left
+                    apple.vel_x = -30
+                    apple.vel_y = 0
+                case -3: #Up
+                    apple.vel_x = 0
+                    apple.vel_y = -30
+                case -2: #Left up
+                    apple.vel_x = -30
+                    apple.vel_y = -30
+                case -1: #Left down
+                    apple.vel_x = -30
+                    apple.vel_y = 30
+                case 0:
+                    apple.vel_x = 0
+                    apple.vel_y = 0
+                case 1: #Right up
+                    apple.vel_x = 30
+                    apple.vel_y = -30
+                case 2: #Right down
+                    apple.vel_x = 30
+                    apple.vel_y = 30
+                case 3: #Down
+                    apple.vel_x = 0
+                    apple.vel_y = 30
+                case 4: #Right
+                    apple.vel_x = 30
+                    apple.vel_y = 0
+                
+        
+            apple.move_time = 0
+        
+        else:
+            apple.vel_x = 0
+            apple.vel_y = 0
         apple.x += apple.vel_x
         apple.y += apple.vel_y
         gameWindow.blit(apple.shape, (apple.x, apple.y))
 
         scoreText = fontH1.render(str(player.score), True, (255, 255, 255))
         gameWindow.blit(scoreText, (10, 10))
+
+        if debug < 0:
+            debugText0 = fontP.render(str(apple.dir), True, (255, 255, 255))
+            gameWindow.blit(debugText0, (0, 60))
+            debugText1 = fontP.render(str(apple.move_time), True, (255, 255, 255))
+            gameWindow.blit(debugText1, (0, 80))
+            debugText2 = fontP.render(str(apple.x), True, (255, 255, 255))
+            gameWindow.blit(debugText2, (0, 100))
+            debugText3 = fontP.render(str(apple.y), True, (255, 255, 255))
+            gameWindow.blit(debugText3, (0, 120))
+            debugText4 = fontP.render(str(apple.vel_x), True, (255, 255, 255))
+            gameWindow.blit(debugText4, (0, 140))
+            debugText5 = fontP.render(str(apple.vel_y), True, (255, 255, 255))
+            gameWindow.blit(debugText5, (0, 160))
 
     #Game Over Screen Drawing
     elif game_state == 2:
