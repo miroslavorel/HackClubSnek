@@ -232,8 +232,6 @@ b = 0
 
 clock = pygame.time.Clock()
 
-debug = 1
-
 tickCool = 1
 
 x = 0
@@ -395,8 +393,6 @@ while True:
                             if player.dir != "UP" and player.dir != "DOWN":
                                 player.dir = "DOWN"
                                 tickCool = -tickCool
-                    if event.key == pygame.K_BACKSPACE:
-                        debug = -debug
 
             player.move()
             if tickCool == -1:
@@ -425,18 +421,17 @@ while True:
                 if apple.player_collision():
                     apple.dir = -apple.dir
 
-            if debug > 0:
-                if player.self_collision():
-                    time.sleep(1)
-                    game_state = 2
+            if player.self_collision():
+                time.sleep(1)
+                game_state = 2
 
-                if player.wall_collision():
-                    time.sleep(1)
-                    game_state = 2
+            if player.wall_collision():
+                time.sleep(1)
+                game_state = 2
 
-                if player.mine_collision():
-                    time.sleep(0.1)
-                    game_state = 2
+            if player.mine_collision():
+                time.sleep(0.1)
+                game_state = 2
     
             
         case 2:
@@ -624,20 +619,6 @@ while True:
 
         scoreText = fontH1.render(str(player.score), True, (255, 255, 255))
         gameWindow.blit(scoreText, (10, 10))
-
-        if debug < 0:
-            debugText0 = fontP.render(str(len(mine_list)), True, (255, 255, 255))
-            gameWindow.blit(debugText0, (0, 60))
-            """ debugText1 = fontP.render(str(apple.move_time), True, (255, 255, 255))
-            gameWindow.blit(debugText1, (0, 80))
-            debugText2 = fontP.render(str(apple.x), True, (255, 255, 255))
-            gameWindow.blit(debugText2, (0, 100))
-            debugText3 = fontP.render(str(apple.y), True, (255, 255, 255))
-            gameWindow.blit(debugText3, (0, 120))
-            debugText4 = fontP.render(str(apple.vel_x), True, (255, 255, 255))
-            gameWindow.blit(debugText4, (0, 140))
-            debugText5 = fontP.render(str(apple.vel_y), True, (255, 255, 255))
-            gameWindow.blit(debugText5, (0, 160)) """
 
     #Game Over Screen Drawing
     elif game_state == 2:
