@@ -1,3 +1,4 @@
+import sys
 import pygame
 import time
 import random
@@ -255,8 +256,8 @@ def spawnNewMine():
         global x
         if alwaysSpawnMines == "YES" and spawnMines == "YES":
             mine = Mine()
-            mine_list.append(mine)
             mine.getNewPos()
+            mine_list.append(mine)
             if alwaysMoveMines == "YES":
                 for i in mine_list:
                     i.getNewPos()
@@ -264,8 +265,8 @@ def spawnNewMine():
             if x + 1 == int(player.score/100) and x + 1 > len(mine_list):
                 x += 1
                 mine = Mine()
-                mine_list.append(mine)
                 mine.getNewPos()
+                mine_list.append(mine)
                 if moveMines == "YES":
                     for i in mine_list:
                         i.getNewPos()
@@ -276,7 +277,8 @@ while True:
         case 0:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    quit(0)
+                    pygame.quit()
+                    sys.exit(0)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         if a == 1:
@@ -293,7 +295,8 @@ while True:
                             a = 1
                             game_state = 0.1
                         elif a == 3:
-                            quit(0)
+                            pygame.quit()
+                            sys.exit(0)
                     elif event.key == pygame.K_DOWN:
                         if a == 3:
                             a = 1
@@ -309,7 +312,8 @@ while True:
         case 0.1:
             for event in pygame.event.get():
                             if event.type == pygame.QUIT:
-                                quit(0)
+                                pygame.quit()
+                                sys.exit(0)
                             elif event.type == pygame.KEYDOWN:
                                 if event.key == pygame.K_RETURN:
                                     if a == 1:
@@ -355,8 +359,6 @@ while True:
                                     elif a == 7:
                                         a = 1
                                         game_state = 0
-                                    else:
-                                        quit(1)
                                 elif event.key == pygame.K_DOWN:
                                     if a == 7:
                                         a = 1
@@ -372,7 +374,8 @@ while True:
         case 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    quit(0)
+                    pygame.quit()
+                    sys.exit(0)
     
                 elif event.type == pygame.KEYDOWN:
                     if tickCool == 1:
@@ -439,7 +442,8 @@ while True:
         case 2:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    quit(0)
+                    pygame.quit()
+                    sys.exit(0)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         a = 1
