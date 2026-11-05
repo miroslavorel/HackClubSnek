@@ -243,11 +243,11 @@ def spawnNewMine():
         global x
         if x + 1 == int(player.score/100) and x + 1 > len(mine_list):
             x += 1
-        mine = Mine()
-        mine_list.append(mine)
-        mine.getNewPos()
-        for i in mine_list:
-            i.getNewPos()
+            mine = Mine()
+            mine_list.append(mine)
+            mine.getNewPos()
+            for i in mine_list:
+                i.getNewPos()
 
 while True:
     clock.tick(10)
