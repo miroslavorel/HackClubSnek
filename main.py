@@ -73,12 +73,12 @@ class Apple():
         self.y = 160
         self.old_x = 190
         self.old_y = 160
-        #self.prev_x = 190
-        #self.prev_y = 160
-        #self.vel_x = 0
-        #self.vel_y = 0
-        #self.move_time = 0
-        #self.dir = 0
+        self.prev_x = 190
+        self.prev_y = 160
+        self.vel_x = 0
+        self.vel_y = 0
+        self.move_time = 0
+        self.dir = 0
         self.shape = pygame.Surface((20, 20))
         self.shape.fill((255, 0, 0))
 
@@ -105,10 +105,10 @@ class Apple():
                 self.old_y = self.y
                 break
 
-    """ def moveIt(self):
-        self.dir = random.randint(-4, 4) """
+    def moveIt(self):
+        self.dir = random.randint(-4, 4)
 
-    """ def wall_collision(self):
+    def wall_collision(self):
         if self.x < 25:
             if self.dir == -4:
                 self.dir = -self.dir
@@ -136,9 +136,9 @@ class Apple():
             elif self.dir == -1:
                 self.dir = -2
             elif self.dir == 2:
-                self.dir = 1 """
+                self.dir = 1
 
-    """ def player_collision(self):
+    def player_collision(self):
         if self.move_time != 5:
             return False
 
@@ -177,7 +177,7 @@ class Apple():
                 next_y < segment_y + 30 and next_y + 20 > segment_y):
                 return True
                 
-        return False """
+        return False
 
 apple = Apple()
 
@@ -237,17 +237,38 @@ tickCool = 1
 
 x = 0
 
+chaos = "NO"
+
+moveApples = "NO"
+
+spawnMines = "NO"
+
+moveMines = "NO"
+
+alwaysMoveMines = "NO"
+
+alwaysSpawnMines = "NO"
+
 game_state = 0
 
 def spawnNewMine():
         global x
-        if x + 1 == int(player.score/100) and x + 1 > len(mine_list):
-            x += 1
+        if alwaysSpawnMines == "YES" and spawnMines == "YES":
             mine = Mine()
             mine_list.append(mine)
             mine.getNewPos()
-            for i in mine_list:
-                i.getNewPos()
+            if alwaysMoveMines == "YES":
+                for i in mine_list:
+                    i.getNewPos()
+        else:
+            if x + 1 == int(player.score/100) and x + 1 > len(mine_list):
+                x += 1
+                mine = Mine()
+                mine_list.append(mine)
+                mine.getNewPos()
+                if moveMines == "YES":
+                    for i in mine_list:
+                        i.getNewPos()
 
 while True:
     clock.tick(10)
@@ -258,32 +279,96 @@ while True:
                     quit(0)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        player.body = [(220, 190), (250, 190), (280, 190), (310, 190)]
-                        player.dir = "RIGHT"
-                        player.score = 0
-                        apple.vel_x = 0
-                        apple.vel_y = 0
-                        apple.getNewPos()
-                        mine_list.clear()
-                        x = 0
+                        if a == 1:
+                            player.body = [(220, 190), (250, 190), (280, 190), (310, 190)]
+                            player.dir = "RIGHT"
+                            player.score = 0
+                            apple.vel_x = 0
+                            apple.vel_y = 0
+                            apple.getNewPos()
+                            mine_list.clear()
+                            x = 0
+                            game_state = 1
+                        elif a == 2:
+                            a = 1
+                            game_state = 0.1
+                        elif a == 3:
+                            quit(0)
+                    elif event.key == pygame.K_DOWN:
+                        if a == 3:
+                            a = 1
+                        else:
+                            a += 1
+                    elif event.key == pygame.K_UP:
+                        if a == 1:
+                            a = 3
+                        else:
+                            a -= 1
 
-                        game_state = 1
 
-            welcomeText = fontH1.render("Chaos Snake", True, (0, 0, 0))
-            madeByTex = fontPmini.render("Made by Miroslav Orel (jbx505)", True, (0, 0, 0))
+        case 0.1:
+            for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                quit(0)
+                            elif event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_RETURN:
+                                    if a == 1:
+                                        if chaos == "YES":
+                                            chaos = "NO"
+                                            moveApples = "NO"
+                                            spawnMines = "NO"
+                                            alwaysMoveMines = "NO"
+                                            alwaysSpawnMines = "NO"
+                                            moveMines = "NO"
+                                        elif chaos == "NO":
+                                            chaos = "YES"
+                                            moveApples = "YES"
+                                            spawnMines = "YES"
+                                            alwaysMoveMines = "YES"
+                                            alwaysSpawnMines = "YES"
+                                            moveMines = "YES"
+                                    elif a == 2:
+                                        if moveApples == "YES":
+                                            moveApples = "NO"
+                                        elif moveApples == "NO":
+                                            moveApples = "YES"
+                                    elif a == 3:
+                                        if spawnMines == "YES":
+                                            spawnMines = "NO"
+                                        elif spawnMines == "NO":
+                                            spawnMines = "YES"
+                                    elif a == 4:
+                                        if moveMines == "YES":
+                                            moveMines = "NO"
+                                        elif moveMines == "NO":
+                                            moveMines = "YES"
+                                    elif a == 5:
+                                        if alwaysSpawnMines == "YES":
+                                            alwaysSpawnMines = "NO"
+                                        elif alwaysSpawnMines == "NO":
+                                            alwaysSpawnMines = "YES"
+                                    elif a == 6:
+                                        if alwaysMoveMines == "YES":
+                                            alwaysMoveMines = "NO"
+                                        elif alwaysMoveMines == "NO":
+                                            alwaysMoveMines = "YES"
+                                    elif a == 7:
+                                        a = 1
+                                        game_state = 0
+                                    else:
+                                        quit(1)
+                                elif event.key == pygame.K_DOWN:
+                                    if a == 7:
+                                        a = 1
+                                    else:
+                                        a += 1
+                                elif event.key == pygame.K_UP:
+                                    if a == 1:
+                                        a = 7
+                                    else:
+                                        a -= 1
 
-            if a > 0:
-                playText = fontP.render("PRESS ENTER TO PLAY", True, (0, 0, 0))
-            elif a < 0:
-                playText = fontP.render("PRESS ENTER TO PLAY", True, (255, 255, 255))
 
-            b += 1
-
-            if b > 3:
-                a = -a
-                b = 0
-
-        
         case 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -313,18 +398,29 @@ while True:
             player.move()
             if tickCool == -1:
                 tickCool = -tickCool
-            #apple.move_time += 1
+            if moveApples == "YES":
+                apple.move_time += 1
             
             if player.apple_collision_detection():
                 player.score += 10
                 player.get_longer()
                 apple.getNewPos()
-                if player.score > 100:
-                    #apple.moveIt()
+                if alwaysMoveMines == "YES" and spawnMines == "YES":
+                    for i in mine_list:
+                        i.getNewPos()
+                if alwaysSpawnMines == "YES" and spawnMines == "YES":
                     spawnNewMine()
+                if moveApples == "YES":
+                    apple.moveIt()
+                if player.score > 100:
+                    if spawnMines == "YES":
+                        spawnNewMine()
 
-            #apple.wall_collision()
-            #apple.player_collision()
+            if moveApples == "YES":
+                apple.wall_collision()
+                apple.player_collision()
+                if apple.player_collision():
+                    apple.dir = -apple.dir
 
             if debug > 0:
                 if player.self_collision():
@@ -346,6 +442,7 @@ while True:
                     quit(0)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
+                        a = 1
                         b = 0
                         game_state = 0
 
@@ -354,11 +451,114 @@ while True:
 
     #Main Menu Drawing
     if game_state == 0:
-        gameWindow.fill((255, 255, 255))
+        if chaos == "YES":
+            gameWindow.fill((0, 0, 0))
+            welcomeText = fontH1.render("CHAOS SNAKE", True, (255, 0, 0))
+            madeByText = fontPmini.render("MADE BY MIROSLAV OREL (jbx505)", True, (255, 0, 0))
+            playText = fontP.render("PLAY", True, (255, 0, 0))
+            optionsText = fontP.render("SETTINGS", True, (255, 0, 0))
+            quitText = fontP.render("QUIT", True, (255, 0, 0))
+            selectBox = pygame.Surface((50, 20))
+            selectBox.fill((0, 0, 0))
+        elif chaos == "NO":
+            gameWindow.fill((255, 255, 255))
+            welcomeText = fontH1.render("CHAOS SNAKE", True, (0, 0, 0))
+            madeByText = fontPmini.render("MADE BY MIROSLAV OREL (jbx505)", True, (0, 0, 0))
+            playText = fontP.render("PLAY", True, (0, 0, 0))
+            optionsText = fontP.render("SETTINGS", True, (0, 0, 0))
+            quitText = fontP.render("QUIT", True, (0, 0, 0))
+            selectBox = pygame.Surface((50, 20))
+            selectBox.fill((0, 0, 0))
 
-        gameWindow.blit(welcomeText, (200, 50))
-        gameWindow.blit(madeByTex, (290, 135))
-        gameWindow.blit(playText, (265, 450))
+        if a == 1:
+            playText = fontP.render("PLAY", True, (255, 255, 255))
+            selectBox = pygame.Surface((playText.get_width() + 18, 35))
+        elif a == 2:
+            optionsText = fontP.render("SETTINGS", True, (255, 255, 255))
+            selectBox = pygame.Surface((optionsText.get_width() + 18, 35))
+        elif a == 3:
+            quitText = fontP.render("QUIT", True, (255, 255, 255))
+            selectBox = pygame.Surface((quitText.get_width() + 18, 35))
+
+        gameWindow.blit(welcomeText, ((gameWindow.width - welcomeText.get_width()) // 2, 50))
+        gameWindow.blit(madeByText, ((gameWindow.width - madeByText.get_width()) // 2, 135))
+        if a == 1:
+            gameWindow.blit(selectBox, ((gameWindow.width - playText.get_width()) // 2 - 9, 350))
+        elif a == 2:
+            gameWindow.blit(selectBox, ((gameWindow.width - optionsText.get_width()) // 2 - 9, 400))
+        elif a == 3:
+            gameWindow.blit(selectBox, ((gameWindow.width - quitText.get_width()) // 2 - 9, 450))
+        gameWindow.blit(playText, ((gameWindow.width - playText.get_width()) // 2, 350))
+        gameWindow.blit(optionsText, ((gameWindow.width - optionsText.get_width()) // 2, 400))
+        gameWindow.blit(quitText, ((gameWindow.width - quitText.get_width()) // 2, 450))
+
+    #Options Menu Drawing
+    elif game_state == 0.1:
+        if moveApples == "YES" and spawnMines == "YES" and moveMines == "YES" and alwaysMoveMines == "YES" and alwaysSpawnMines == "YES":
+            chaos = "YES"
+        else:
+            chaos = "NO"
+        if chaos == "YES":
+            gameWindow.fill((0, 0, 0))
+            settingsText = fontH1.render("SETTINGS", True, (255, 0, 0))
+            chaosText = fontP.render((f"CHAOS: {chaos}"), True, (255, 0, 0))
+            option1Text = fontP.render((f"MOVING APPLES: {moveApples}"), True, (255, 0, 0))
+            option2Text = fontP.render((f"SPAWN MINES: {spawnMines}"), True, (255, 0, 0))
+            option3Text = fontP.render((f"MOVE MINES: {moveMines}"), True, (255, 0, 0))
+            option4Text = fontP.render((f"SPAWN NEW MINE AFTER EVERY APPLE: {alwaysSpawnMines}"), True, (255, 0, 0))
+            option5Text = fontP.render((f"MOVE MINES AFTER EVERY APPLE: {alwaysMoveMines}"), True, (255, 0, 0))
+            returnText = fontP.render(("BACK"), True, (255, 0, 0))
+        elif chaos == "NO":
+            gameWindow.fill((255, 255, 255))
+            settingsText = fontH1.render("SETTINGS", True, (0, 0, 0))
+            chaosText = fontP.render((f"CHAOS: {chaos}"), True, (0, 0, 0))
+            option1Text = fontP.render((f"MOVING APPLES: {moveApples}"), True, (0, 0, 0))
+            option2Text = fontP.render((f"SPAWN MINES: {spawnMines}"), True, (0, 0, 0))
+            option3Text = fontP.render((f"MOVE MINES: {moveMines}"), True, (0, 0, 0))
+            option4Text = fontP.render((f"SPAWN NEW MINE AFTER EVERY APPLE: {alwaysSpawnMines}"), True, (0, 0, 0))
+            option5Text = fontP.render((f"MOVE MINES AFTER EVERY APPLE: {alwaysMoveMines}"), True, (0, 0, 0))
+            returnText = fontP.render(("BACK"), True, (0, 0, 0))
+        selectBox2 = pygame.Surface((50, 20))
+        selectBox2.fill((0, 0, 0))
+
+        match a:
+            case 1:
+                chaosText = fontP.render((f"CHAOS: {chaos}"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((chaosText.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - chaosText.get_width()) // 2  - 9, 200))
+            case 2:
+                option1Text = fontP.render((f"MOVING APPLES: {moveApples}"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((option1Text.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - option1Text.get_width()) // 2  - 9, 250))
+            case 3:
+                option2Text = fontP.render((f"SPAWN MINES: {spawnMines}"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((option2Text.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - option2Text.get_width()) // 2  - 9, 300))
+            case 4:
+                option3Text = fontP.render((f"MOVE MINES: {moveMines}"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((option3Text.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - option3Text.get_width()) // 2 - 9, 350))
+            case 5:
+                option4Text = fontP.render((f"SPAWN NEW MINE AFTER EVERY APPLE: {alwaysSpawnMines}"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((option4Text.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - option4Text.get_width()) // 2 - 9, 400))
+            case 6:
+                option5Text = fontP.render((f"MOVE MINES AFTER EVERY APPLE: {alwaysMoveMines}"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((option5Text.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - option5Text.get_width()) // 2 - 9, 450))
+            case 7:
+                returnText = fontP.render(("BACK"), True, (255, 255, 255))
+                selectBox2 = pygame.Surface((returnText.get_width() + 18, 35))
+                gameWindow.blit(selectBox2, ((gameWindow.width - returnText.get_width()) // 2  - 9, 500))
+        
+        gameWindow.blit(settingsText, ((gameWindow.width - settingsText.get_width()) // 2, 50))
+        gameWindow.blit(chaosText, ((gameWindow.width - chaosText.get_width()) // 2, 200))
+        gameWindow.blit(option1Text, ((gameWindow.width - option1Text.get_width()) // 2, 250))
+        gameWindow.blit(option2Text, ((gameWindow.width - option2Text.get_width()) // 2, 300))
+        gameWindow.blit(option3Text, ((gameWindow.width - option3Text.get_width()) // 2, 350))
+        gameWindow.blit(option4Text, ((gameWindow.width - option4Text.get_width()) // 2, 400))
+        gameWindow.blit(option5Text, ((gameWindow.width - option5Text.get_width()) // 2, 450))
+        gameWindow.blit(returnText, ((gameWindow.width - returnText.get_width()) // 2, 500))
 
     #Main Game Loop Drawing
     elif game_state == 1:
@@ -378,7 +578,7 @@ while True:
             gameWindow.blit(player.shape, i)
         gameWindow.blit(player.head, player.body[-1])
 
-        """ if apple.move_time == 5:
+        if apple.move_time == 5:
             match apple.dir:
                 case -4: #Left
                     apple.vel_x = -30
@@ -415,7 +615,7 @@ while True:
             apple.vel_x = 0
             apple.vel_y = 0
         apple.x += apple.vel_x
-        apple.y += apple.vel_y """
+        apple.y += apple.vel_y
         gameWindow.blit(apple.shape, (apple.x, apple.y))
 
         scoreText = fontH1.render(str(player.score), True, (255, 255, 255))
@@ -439,23 +639,38 @@ while True:
     elif game_state == 2:
         gameWindow.fill((0, 0, 0))
 
-        game_over = fontH1.render("GAME OVER", True, (255, 255, 255))
-        gameWindow.blit(game_over, (190, 50))
+        if chaos == "YES":
+            game_over = fontH1.render("GAME OVER", True, (255, 0, 0))
+        elif chaos == "NO":
+            game_over = fontH1.render("GAME OVER", True, (255, 255, 255))
+        gameWindow.blit(game_over, ((gameWindow.width - game_over.get_width()) // 2, 50))
 
         if player.self_collision():
-            collisionText = fontH2.render("YOU COLIDED WITH YOURSELF", True, (255, 255, 255))
-            gameWindow.blit(collisionText, (65, 250))
+            if chaos == "YES":
+                collisionText = fontH2.render("YOU COLIDED WITH YOURSELF", True, (255, 0, 0))
+            elif chaos == "NO":
+                collisionText = fontH2.render("YOU COLIDED WITH YOURSELF", True, (255, 255, 255))
+            gameWindow.blit(collisionText, ((gameWindow.width - collisionText.get_width()) // 2, 250))
 
         if player.wall_collision():
-            collisionText = fontH2.render("YOU COLIDED WITH THE WALL", True, (255, 255, 255))
-            gameWindow.blit(collisionText, (60, 250))
+            if chaos == "YES":
+                collisionText = fontH2.render("YOU COLIDED WITH THE WALL", True, (255, 0, 0))
+            elif chaos == "NO":
+                collisionText = fontH2.render("YOU COLIDED WITH THE WALL", True, (255, 255, 255))
+            gameWindow.blit(collisionText, ((gameWindow.width - collisionText.get_width()) // 2, 250))
 
         if player.mine_collision():
-            collisionText = fontH2.render("YOU STEPPED ON A MINE", True, (255, 255, 255))
-            gameWindow.blit(collisionText, (130, 250))
+            if chaos == "YES":
+                collisionText = fontH2.render("YOU STEPPED ON A MINE", True, (255, 0, 0))
+            elif chaos == "NO":
+                collisionText = fontH2.render("YOU STEPPED ON A MINE", True, (255, 255, 255))
+            gameWindow.blit(collisionText, ((gameWindow.width - collisionText.get_width()) // 2, 250))
 
         if a > 0:
-            backToMenu = fontP.render("PRESS ENTER TO CONTINUE", True, (255, 255, 255))
+            if chaos == "YES":
+                backToMenu = fontP.render("PRESS ENTER TO CONTINUE", True, (255, 0, 0))
+            elif chaos == "NO":
+                backToMenu = fontP.render("PRESS ENTER TO CONTINUE", True, (255, 255, 255))
         elif a < 0:
             backToMenu = fontP.render("PRESS ENTER TO CONTINUE", True, (0, 0, 0))
 
@@ -465,7 +680,7 @@ while True:
             a = -a
             b = 0
 
-        gameWindow.blit(backToMenu, (230, 450))
+        gameWindow.blit(backToMenu, ((gameWindow.width - backToMenu.get_width()) // 2, 450))
 
 
     pygame.display.flip()
