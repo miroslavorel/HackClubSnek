@@ -1,7 +1,16 @@
+import os
 import sys
 import pygame
 import time
 import random
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 pygame.init()
 pygame.font.init()
@@ -15,7 +24,7 @@ gameWindow.fill((0,0,0))
 pygame.display.set_caption("TEST WINDOW")
 bg = pygame.Surface((800, 600))
 bg.fill((0, 0, 0))
-bg = pygame.image.load("imgs/bg.png").convert_alpha()
+bg = pygame.image.load(resource_path("imgs/bg.png")).convert_alpha()
 bg = pygame.transform.scale(bg, (800, 600))
 
 class Player():
